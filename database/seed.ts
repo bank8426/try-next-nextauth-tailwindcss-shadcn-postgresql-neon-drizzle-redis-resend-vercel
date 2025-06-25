@@ -1,6 +1,4 @@
 import dummyBooks from "@/dummybooks.json";
-// import { upload } from "@imagekit/next";
-// import { getUploadAuthParams } from "@imagekit/next/server";
 import ImageKit from "imagekit";
 import { booksTable } from "@/database/schema";
 import { neon } from "@neondatabase/serverless";
