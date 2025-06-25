@@ -50,6 +50,7 @@ interface Props {
   folder: string;
   variant: "dark" | "light";
   onFileChange: (filePath: string) => void;
+  value?: string;
 }
 
 const FileUpload = ({
@@ -59,10 +60,13 @@ const FileUpload = ({
   folder,
   variant,
   onFileChange,
+  value,
 }: Props) => {
   // State to keep track of the current upload progress (percentage)
   const [progress, setProgress] = useState(0);
-  const [file, setFile] = useState<{ filePath: string } | null>(null);
+  const [file, setFile] = useState<{ filePath: string | null }>({
+    filePath: value ?? null,
+  });
   const styles = {
     button:
       variant === "dark"
