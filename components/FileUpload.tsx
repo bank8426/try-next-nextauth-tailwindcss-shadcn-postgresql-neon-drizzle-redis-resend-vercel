@@ -112,7 +112,7 @@ const FileUpload = ({
           setProgress((event.loaded / event.total) * 100);
         },
         folder: folder,
-        checks: `"file.mime" : ${accept}`,
+        checks: `"file.mime" : ${type}`,
         useUniqueFileName: true,
         // Abort signal to allow cancellation of the upload if needed.
         abortSignal: abortController.signal,
@@ -178,6 +178,7 @@ const FileUpload = ({
         type="file"
         ref={fileInputRef}
         onChange={handleUpload}
+        accept={accept}
       />
       {/* Button to trigger the upload process */}
       <button
