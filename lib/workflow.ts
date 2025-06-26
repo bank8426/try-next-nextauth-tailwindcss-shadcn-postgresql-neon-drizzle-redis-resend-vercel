@@ -36,6 +36,7 @@ export const sendEmail = async ({
         subject,
         message,
       },
+      { publicKey: config.env.emailJS.publicKey },
     );
 
     console.log("sent email result");
