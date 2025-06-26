@@ -7,10 +7,11 @@ import { desc } from "drizzle-orm";
 
 const Home = async () => {
   const session = await auth();
+
+  // TODO handle pagination
   const latestBooks = (await db
     .select()
     .from(booksTable)
-    .limit(10)
     .orderBy(desc(booksTable.createdAt))) as Book[];
 
   return (
