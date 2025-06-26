@@ -1,7 +1,7 @@
 import { Client as WorkflowClient } from "@upstash/workflow";
 import { Client as QStashClient } from "@upstash/qstash";
 import config from "./config";
-import emailjs from "@emailjs/browser";
+import emailjs from "@emailjs/nodejs";
 
 const qstashClient = new QStashClient({
   token: config.env.upstash.qstashToken,
@@ -22,41 +22,21 @@ export const sendEmail = async ({
   message: string;
 }) => {
   try {
-    console.log("sending email with : ", {
-      email,
-      subject,
-      message,
-    });
-
-    const result = await emailjs.send(
-      config.env.emailJS.serviceId!,
-      config.env.emailJS.templateId!,
-      {
-        email,
-        subject,
-        message,
+    await qstashClient.publishJSON({
+      url: "https://api.emailjs.com/api/v1.0/email/send",
+      body: {
+        service_id: config.env.emailJS.serviceId,
+        template_id: config.env.emailJS.templateId,
+        user_id: config.env.emailJS.publicKey,
+        template_params: {
+          email,
+          subject,
+          message,
+        },
+        accessToken: config.env.emailJS.privateKey,
       },
-      { publicKey: config.env.emailJS.publicKey },
-    );
-
-    console.log("sent email result");
-    console.log(result);
+    });
   } catch (error) {
     console.log(error);
   }
-
-  // TODO
-  // await qstashClient.publishJSON({
-  //   // api: {
-  //   //   name: "email",
-  //   //   // provider: "https://firstqstashmessage.requestcatcher.com/test",
-  //   // },
-  //   // url: "https://firstqstashmessage.requestcatcher.com/test",
-  //   body: {
-  //     from: "Gu Bank <gubankcpe.dev@gmail.com>",
-  //     to: [email],
-  //     subject: "Helloo",
-  //     html: "<p>World</p>",
-  //   },
-  // });
 };
