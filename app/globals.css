@@ -265,8 +265,10 @@
   @apply mt-16 mb-20 flex flex-col gap-16 lg:mt-36 lg:flex-row;
 }
 
-@utility book-details-h3 {
-  @apply text-primary text-xl font-semibold;
+@utility book-details {
+  h3 {
+    @apply text-primary text-xl font-semibold;
+  }
 }
 
 /* Library */
