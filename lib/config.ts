@@ -14,6 +14,10 @@ const config = {
       qstashUrl: process.env.QSTASH_URL,
       qstashToken: process.env.QSTASH_TOKEN,
     },
+    emailJS: {
+      serviceId: process.env.EMAILJS_SERVICE_ID,
+      templateId: process.env.EMAILJS_TEMPLATE_ID,
+    },
   },
 };
 

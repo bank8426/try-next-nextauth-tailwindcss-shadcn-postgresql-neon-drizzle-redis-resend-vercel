@@ -204,7 +204,7 @@ const FileUpload = ({
 
         <p className={cn("text-base", styles.placeholder)}>{placeholder}</p>
 
-        {file && (
+        {file.filePath && (
           <p className={cn("upload-filename", styles.text)}>{file.filePath}</p>
         )}
       </button>
@@ -212,7 +212,7 @@ const FileUpload = ({
       {/* Display the current upload progress */}
       <progress className="w-full" value={progress} max={100}></progress>
 
-      {file &&
+      {file.filePath &&
         (type === "image" ? (
           <IKImage
             src={file.filePath}

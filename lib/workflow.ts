@@ -1,6 +1,7 @@
 import { Client as WorkflowClient } from "@upstash/workflow";
 import { Client as QStashClient } from "@upstash/qstash";
 import config from "./config";
+import emailjs from "@emailjs/browser";
 
 const qstashClient = new QStashClient({
   token: config.env.upstash.qstashToken,
@@ -20,7 +21,19 @@ export const sendEmail = async ({
   subject: string;
   message: string;
 }) => {
-  console.error("Send email not implemented");
+  try {
+    await emailjs.send(
+      config.env.emailJS.serviceId!,
+      config.env.emailJS.templateId!,
+      {
+        email,
+        subject,
+        message,
+      },
+    );
+  } catch (error) {
+    console.log(error);
+  }
 
   // TODO
   // await qstashClient.publishJSON({
