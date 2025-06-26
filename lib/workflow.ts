@@ -22,7 +22,13 @@ export const sendEmail = async ({
   message: string;
 }) => {
   try {
-    await emailjs.send(
+    console.log("sending email with : ", {
+      email,
+      subject,
+      message,
+    });
+
+    const result = await emailjs.send(
       config.env.emailJS.serviceId!,
       config.env.emailJS.templateId!,
       {
@@ -31,6 +37,9 @@ export const sendEmail = async ({
         message,
       },
     );
+
+    console.log("sent email result");
+    console.log(result);
   } catch (error) {
     console.log(error);
   }
