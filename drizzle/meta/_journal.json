@@ -15,6 +15,13 @@
       "when": 1750840280345,
       "tag": "0001_wandering_bill_hollister",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1750920137903,
+      "tag": "0002_curvy_mystique",
+      "breakpoints": true
     }
   ]
 }
