@@ -69,7 +69,7 @@ const BookOverview = async ({
         </div>
         <p className="book-description">{description}</p>
 
-        {user && (
+        {user.status === "APPROVED" && (
           <BorrowBookButton
             bookId={id}
             userId={userId}

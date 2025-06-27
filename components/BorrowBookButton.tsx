@@ -25,6 +25,7 @@ const BorrowBookButton = ({
   const handleBorrow = async () => {
     if (!isEligible) {
       toast.error("Error", { description: message });
+      return;
     }
 
     setBorrowing(true);
