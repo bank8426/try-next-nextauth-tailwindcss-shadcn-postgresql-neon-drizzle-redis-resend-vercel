@@ -8,11 +8,12 @@ import { desc } from "drizzle-orm";
 const Home = async () => {
   const session = await auth();
 
-  // TODO handle pagination
   const latestBooks = (await db
     .select()
     .from(booksTable)
-    .orderBy(desc(booksTable.createdAt))) as Book[];
+    .orderBy(desc(booksTable.createdAt))
+    .offset(0)
+    .limit(13)) as Book[];
 
   return (
     <>
@@ -21,6 +22,7 @@ const Home = async () => {
         title="Latest Books"
         books={latestBooks.slice(1)}
         containerClassName="mt-28"
+        seeAllBooksLink
       />
     </>
   );
