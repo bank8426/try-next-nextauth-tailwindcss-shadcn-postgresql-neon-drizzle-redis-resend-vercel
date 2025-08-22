@@ -1,5 +1,5 @@
 <h3 align="center">A University Library Management System with Admin Panel</h3>
-
+<!-- talk about how workflow, qstash and emailjs work together -->
 ## ⚠️ Note
 
 This project was implemented based on a tutorial video on YouTube from JS Mastery [Build and Deploy a Fullstack App with Admin Dashboard | Next.js, PostgreSQL, Redis, Auth.js](https://www.youtube.com/watch?v=EZajJGOMWas).
@@ -138,14 +138,15 @@ Since the whole project is split into 2-part videos ( Part 2 on **JS Mastery Pro
 - TypeScript - as a type-checking tool
 - Auth.js v5 (known as NextAuth.js) - as an authentication tool
 - Neon - cloud `PostgreSQL` database
-- drizzle - as an ORM for the database
-- Upstash Redis - for caching, rate limiting
+- drizzle - as an ORM for the SQL database which include `PostgreSQL` and provide driver/adapters to connect to cloud databases like `Neon`. It also provide schema generation and migration tools.
+- Upstash Redis - for
+  `Upstash Rate Limit` feature, `rate limiting` which use `Redis` to track IP address and number of requests per minute(calculate using Fixed Window algorithm)
 - Upstash Workflow - for scheduled automated tasks with multiple steps
 - ImageKit - for image and video storage and optimization, and transformations when displaying
 - Tailwind CSS v4 - as a CSS framework
 - ShadCN - as a UI component library
 
-- mailjs, as an email sender, since Resend requires a real domain
+- mailjs - as an email sender instead of Resend that recommended by tutorial video since Resend requires a real domain to send email from.
 - vercel - as a deployment tool
 
 - react-hook-form - as a form handling tool
@@ -178,7 +179,7 @@ Features of the University Library Management System Project
 - Database ORM: Drizzle ORM for simplified and efficient database interactions.
 - Modern UI/UX: Built with TailwindCSS, ShadCN, and other cutting-edge tools.
 - Technology Stack: Next.js with TypeScript for scalable development, and NextAuth for robust authentication.
-- Seamless Email Handling: Resend for automated email communications, including notifications and updates.
+- Seamless Email Handling: MailJS for automated email communications, including notifications and updates.
 
 ## <a name="quick-start">Quick Start</a>
 
@@ -252,6 +253,15 @@ Your server will run on [http://localhost:3000](http://localhost:3000/)
 
 ## <a name="learn">What I learned</a>
 
+- Auth.js
+
+  - Initialize Auth.js - By default they provide authentication process include built-in sign in and sign up pages for all providers they support. So no need to build it from scratch by yourself. But you can also do it. Like in this project, it has custom sign in page and custom logic for to handle email and password authentication process.
+
+    - To create custom sign in and make Auth.js know about it, you need to define the path to `signIn` in `pages` option.
+    - To customize the authentication process that work with email/username and password, you need to use `CredentialsProvider` in `providers` option and then add `authorize` function to then handle the authentication process as you like. You can see more details in https://authjs.dev/getting-started/authentication/credentials
+
+- zod
+
 ## <a name="note">Implementation Notes</a>
 
 - Tailwind CSS
@@ -301,8 +311,19 @@ Your server will run on [http://localhost:3000](http://localhost:3000/)
       }
       ```
 
-- Auth.js
+- workflow
 
-  - Create Customizing the provider - in case you want to handle the authentication process by yourself. You can use `CredentialsProvider` to create a custom provider.
+  - this time we follow official example from upstash workflow https://upstash.com/docs/workflow/examples/customerOnboarding which follow their recommended best practices, not like in another tutorial video that i did in https://github.com/bank8426/try-express-mongodb
+
+- Qstash with EmailJS API
+  - Qstash publishJSON
+    EmailJS API accessToken field
+    there are two ways to send email
+  1. using SDK (there split into 2 main types of SDK, one is for server side(Node.js or Next.js but on API route or server components) and one is for browser side like React or Next.js on client side pages or components)
+  2. using REST API
+     Since we design to use Qstash as middleman to handle the email sending process, we will use REST API and supplie all required fields for EmailJS into the body of publishJSON.
+     <!-- https://www.emailjs.com/docs/sdk/send/ -->
+     <!-- https://www.emailjs.com/docs/rest-api/send/ -->
+     `accessToken` in `camelCase`(other parameters are in `snake_case`) is required for EmailJS API but in document said it not required which confuses me.
 
 ## <a name="miss">Missing Features</a>
