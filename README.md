@@ -2,6 +2,10 @@
 <!-- talk about how workflow, qstash and emailjs work together -->
 ## ⚠️ Note
 
+<!-- aboute borrow function -->
+
+<!-- proect cover only cover user platform and partial of admin panel -->
+
 This project was implemented based on a tutorial video on YouTube from JS Mastery [Build and Deploy a Fullstack App with Admin Dashboard | Next.js, PostgreSQL, Redis, Auth.js](https://www.youtube.com/watch?v=EZajJGOMWas).
 
 Since the whole project is split into 2-part videos ( Part 2 on **JS Mastery Pro** ). So I implemented only Part 1
@@ -43,12 +47,6 @@ Since the whole project is split into 2-part videos ( Part 2 on **JS Mastery Pro
   <img src="public/readme/welcome.gif" alt="Welcome" />
 </a>
 
-#### Approved account email
-
-<a href="">
-  <img src="public/readme/approved.gif" alt="Approved" />
-</a>
-
 #### Inactive reminder email
 
 <a href="">
@@ -59,24 +57,6 @@ Since the whole project is split into 2-part videos ( Part 2 on **JS Mastery Pro
 
 <a href="">
   <img src="public/readme/active.gif" alt="Active" />
-</a>
-
-#### Borrowed book reminder email
-
-<a href="">
-  <img src="public/readme/borrowed.gif" alt="Borrowed" />
-</a>
-
-#### Borrowed book due date reminder email
-
-<a href="">
-  <img src="public/readme/due.gif" alt="Due" />
-</a>
-
-#### Borrowed book overdue reminder email (Penalty)
-
-<a href="">
-  <img src="public/readme/penalty.gif" alt="Penalty" />
 </a>
 
 ### User Role
@@ -141,7 +121,8 @@ Since the whole project is split into 2-part videos ( Part 2 on **JS Mastery Pro
 - drizzle - as an ORM for the SQL database which include `PostgreSQL` and provide driver/adapters to connect to cloud databases like `Neon`. It also provide schema generation and migration tools.
 - Upstash Redis - for
   `Upstash Rate Limit` feature, `rate limiting` which use `Redis` to track IP address and number of requests per minute(calculate using Fixed Window algorithm)
-- Upstash Workflow - for scheduled automated tasks with multiple steps
+- Qstash - as message queue and scheduling service which act as middleman between our code and third-party service with guaranteed delivery and auto retry feature. In this project, we send message to Qstash and Qstash will call MailJS API to send email.
+- Upstash Workflow - This Workflow is something they built on top of `Qstash`. Allow you to scheduled automated tasks containing multiple steps in process and they will keep track of step and result in each step. In this project, we use it to track user status and handle whole sending email process for onboarding user including send welcome email, active/inactive user reminder email based on user status.
 - ImageKit - for image and video storage and optimization, and transformations when displaying
 - Tailwind CSS v4 - as a CSS framework
 - ShadCN - as a UI component library
@@ -315,10 +296,92 @@ Your server will run on [http://localhost:3000](http://localhost:3000/)
 
   - this time we follow official example from upstash workflow https://upstash.com/docs/workflow/examples/customerOnboarding which follow their recommended best practices, not like in another tutorial video that i did in https://github.com/bank8426/try-express-mongodb
 
-- Qstash with EmailJS API
-  - Qstash publishJSON
-    EmailJS API accessToken field
+- whole process of reminder email between our backend callback endpoint, qstash , workflow and emailjs
+
+  - Sign up API
+    - After user signup successfully, we create a new workflow run and pass user email, fullname and callback endpoint to it.
+  - Workflow
+
+    - Workflow will call our callback endpoint with user email, fullname as for first step.
+
+<!-- TODO check what callback url is -->
+
+- Callback endpoint (Workflow step 1)
+  - Workflow will check current step which is first step. So extract email and fullname from request body
+  - Run step `new-signup` which will send message to `Qstash` to call EmailJS API to send email with necessary parameters.
+  - If call Qstash successfully, Qstash will register that message in their queue and response back with `message ID`
+  - Workflow will update `new-signup` step as last step and finish this step
+- Qstash after receive message from step `new-signup`
+  - Call EmailJS API to send email with supplied parameters on our behalf and track result on their side.
+  - (Optional) Actually, you can supplie another callback endpoint to Qstash to call it after call EmailJS API. And also fail callback endpoint, in case it fail to call EmailJS API.
+- Workflow after `new-signup`
+
+  - Workflow will call our callback endpoint.
+
+- Callback endpoint (Workflow step 2)
+
+  - Workflow will check current step which is second step. So it will run code after `new-signup` step.
+  - So it will run step `wait-for-3-days` which will wait for 3 days.
+  - Workflow will update `wait-for-3-days` step as last step and finish this step
+
+- Workflow after `wait-for-3-days`
+  - Workflow will wait for 3 days.
+  - Then Workflow will call our callback endpoint.
+- Callback endpoint (Workflow step 3)
+
+  - Workflow will check current step which is third step. So it will run code after `wait-for-3-days` step.
+  - So it go inside infinite loop
+  - will run step `check-user-state` which will check user state.
+  - Workflow will update `check-user-state` step as last step and finish this step. And since we call return in `check-user-state` step, it will also track it as result of this step.
+
+- Workflow after `check-user-state`
+
+  - Workflow will call our callback endpoint.
+
+- Callback endpoint (Workflow step 4)
+
+  - Workflow will check current step which is fourth step. So it will run code after `check-user-state` step with result of `check-user-state` step.
+  - So it will update `state` with result of `check-user-state` step.
+  - Then it will check `state` and run appropriate step based on `state`.
+  - If it will run either `send-email-non-active` or `send-email-active` which will send message to `Qstash` to call `EmailJS API` to send email with necessary parameters.
+  - If call Qstash successfully, Qstash will register that message in their queue and response back with `message ID`
+  - Workflow will update `send-email-non-active` or `send-email-active` step as last step and finish this step.
+
+- Qstash after receive message from step `send-email-non-active` or `send-email-active`
+
+  - Call EmailJS API to send email with supplied parameters on our behalf and track result on their side.
+
+- Workflow after `send-email-non-active` or `send-email-active`
+  - Workflow will call our callback endpoint.
+- Callback endpoint (Workflow step 5)
+
+  - Workflow will check current step which is fifth step. So it will run code after `send-email-non-active` or `send-email-active` step.
+  - So it will run step `"wait-for-1-month"` which will wait for 1 month.
+  - Workflow will update `wait-for-1-month` step as last step and finish this step
+
+- Workflow after `wait-for-1-month`
+  - Workflow will wait for 1 month.
+  - Then Workflow will call our callback endpoint.
+- Callback endpoint (Workflow step 6)
+  - Workflow will check current step which is sixth step. So it will run code after `wait-for-1-month` step.
+  - So it will go back to top of infinite loop and run step `check-user-state` which will check user state.
+  - Workflow will update `check-user-state` step as last step and finish this step. And since we call return in `check-user-state` step, it will also track it as result of this step.
+- Callback endpoint (Workflow step 7)
+
+  - Workflow will check current step which is seventh step. So it will run code after `check-user-state` step with result of `check-user-state` step.
+  - So it will update `state` with result of `check-user-state` step.
+  - Then it will check `state` and run appropriate step based on `state`.
+  - If it will run either `send-email-non-active` or `send-email-active` which will send message to `Qstash` to call `EmailJS API` to send email with necessary parameters.
+  - If call Qstash successfully, Qstash will register that message in their queue and response back with `message ID`
+  - Workflow will update `send-email-non-active` or `send-email-active` step as last step and finish this step.
+
+- And the process repeat on every side in this workflow.
+
+- Qstash publishJSON
+
+  - EmailJS API accessToken field
     there are two ways to send email
+
   1. using SDK (there split into 2 main types of SDK, one is for server side(Node.js or Next.js but on API route or server components) and one is for browser side like React or Next.js on client side pages or components)
   2. using REST API
      Since we design to use Qstash as middleman to handle the email sending process, we will use REST API and supplie all required fields for EmailJS into the body of publishJSON.
@@ -326,4 +389,13 @@ Your server will run on [http://localhost:3000](http://localhost:3000/)
      <!-- https://www.emailjs.com/docs/rest-api/send/ -->
      `accessToken` in `camelCase`(other parameters are in `snake_case`) is required for EmailJS API but in document said it not required which confuses me.
 
+- ImageKit
+  - file processing limit per month is 100MB. So need to make sure to use small file when first upload image to ImageKit like when add mock data into database which make it exceed the limit. And need to make sure not to re-seed data.
+
 ## <a name="miss">Missing Features</a>
+
+- Remider email
+  - Approved account email
+  - Borrowed book reminder email
+  - Borrowed book due date reminder email
+  - Borrowed book overdue reminder email (Penalty)
