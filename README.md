@@ -1,10 +1,12 @@
 <h3 align="center">A University Library Management System with Admin Panel</h3>
-<!-- talk about how workflow, qstash and emailjs work together -->
+
 ## ⚠️ Note
 
-<!-- aboute borrow function -->
+<!-- move code to library page from books[id] -->
 
-<!-- proect cover only cover user platform and partial of admin panel -->
+<!-- aboute borrow function add new borrow record and decrement available of book -->
+
+<!-- project cover only cover user platform and partial of admin panel -->
 
 This project was implemented based on a tutorial video on YouTube from JS Mastery [Build and Deploy a Fullstack App with Admin Dashboard | Next.js, PostgreSQL, Redis, Auth.js](https://www.youtube.com/watch?v=EZajJGOMWas).
 
@@ -27,7 +29,7 @@ Since the whole project is split into 2-part videos ( Part 2 on **JS Mastery Pro
 
 ### Authentication
 
-#### Sign Up +
+#### Sign Up
 
 <a href="">
   <img src="public/readme/signup.gif" alt="Sign Up" />
@@ -67,19 +69,19 @@ Since the whole project is split into 2-part videos ( Part 2 on **JS Mastery Pro
   <img src="public/readme/home.gif" alt="Home" />
 </a>
 
-#### Library Page (All books + search + pagination + filters)
+#### Library Page (All books + pagination)
 
 <a href="">
   <img src="public/readme/library.gif" alt="Library" />
 </a>
 
-#### Book Detail Page + Similar books + Borrow button( For approved users)
+#### Book Detail Page + Borrow button( For approved users)
 
 <a href="">
   <img src="public/readme/book.gif" alt="Book" />
 </a>
 
-#### Profile Page (Borrowed books + book receipt)
+#### Profile Page (Borrowed books)
 
 <a href="">
   <img src="public/readme/profile.gif" alt="Profile" />
@@ -87,28 +89,10 @@ Since the whole project is split into 2-part videos ( Part 2 on **JS Mastery Pro
 
 ### Admin Role (Web portal)
 
-#### Dashboard (Statistics + New users + Books + Borrow requests + More)
+#### Add new book
 
 <a href="">
-  <img src="public/readme/admin-dashboard.gif" alt="Admin Dashboard" />
-</a>
-
-#### Users Management
-
-<a href="">
-  <img src="public/readme/admin-users.png" alt="Users" />
-</a>
-
-#### Books Management
-
-<a href="">
-  <img src="public/readme/admin-books.png" alt="Books" />
-</a>
-
-#### Account Requests
-
-<a href="">
-  <img src="public/readme/admin-account-requests.png" alt="Account Requests" />
+  <img src="public/readme/admin-add-book.gif" alt="Admin Add Book" />
 </a>
 
 ## <a name="tech-stack">Tech Stack</a>
@@ -395,7 +379,51 @@ Your server will run on [http://localhost:3000](http://localhost:3000/)
 ## <a name="miss">Missing Features</a>
 
 - Remider email
+
   - Approved account email
   - Borrowed book reminder email
   - Borrowed book due date reminder email
   - Borrowed book overdue reminder email (Penalty)
+
+- User Panel
+
+  - Library page
+    - Search
+    - Sort (Oldest, Newest, Available, Highest rated)
+  - Book detail page
+    - Similar books
+  - User profile page
+    - Download receipt
+    - Profile
+      - Name, university id, university card and account status
+
+- Admin Panel
+  - Home
+    - Statistics compared to previous month
+      - total borrow books
+      - total users
+      - total available books
+    - Recently added books
+    - Borrow requests
+    - Account requests
+    - Search
+  - Users management
+    - List
+    - Search
+    - Pagination
+    - Edit user role (Admin, User)
+    - View user university id card
+  - Books management
+    - List
+    - Search
+    - Pagination
+    - Edit book
+  - Borrow records
+    - List
+    - Search
+    - Pagination
+    - See borrow book receipt
+    - Set borrow book status (Borrowed, Returned, Overdued)
+  - Account requests
+    - List of user accounts
+    - Approve/Revoke user account
