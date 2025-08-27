@@ -26,7 +26,7 @@ const BookList = ({
 
           {seeAllBooksLink && (
             <div className="flex items-center">
-              <Link className="text-light-100" href={`/books?page=1`}>
+              <Link className="text-light-100" href={`/library?page=1`}>
                 <p className="font-bebas-neue text-light-100 text-2xl">
                   {"See all books >"}
                 </p>
