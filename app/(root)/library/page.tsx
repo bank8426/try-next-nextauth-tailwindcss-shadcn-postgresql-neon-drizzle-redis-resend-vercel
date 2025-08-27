@@ -74,13 +74,9 @@ const page = async ({
         </div>
       )}
 
-      <BookList
-        title={`Latest Books (${total})`}
-        books={latestBooks}
-        containerClassName="mt-28"
-      />
+      <BookList title={`Latest Books (${total})`} books={latestBooks} />
 
-      <Pagination id="pagination" className="text-light-100">
+      <Pagination id="pagination" className="text-light-100 pt-10">
         <PaginationContent>
           {page > 1 && (
             <>
