@@ -40,19 +40,19 @@ Since the whole project is split into 2-part videos ( Part 2 on **JS Mastery Pro
 #### Welcome email
 
 <a href="">
-  <img src="public/readme/welcome.gif" alt="Welcome" />
+  <img src="public/readme/welcome-email.png" alt="Welcome" />
 </a>
 
 #### Inactive reminder email
 
 <a href="">
-  <img src="public/readme/inactive.gif" alt="Inactive" />
+  <img src="public/readme/non-active-email.png" alt="Inactive" />
 </a>
 
 #### Congratulations email after becoming active again
 
 <a href="">
-  <img src="public/readme/active.gif" alt="Active" />
+  <img src="public/readme/active-email.png" alt="Active" />
 </a>
 
 ### User Role
@@ -67,6 +67,12 @@ Since the whole project is split into 2-part videos ( Part 2 on **JS Mastery Pro
 
 <a href="">
   <img src="public/readme/library.gif" alt="Library" />
+</a>
+
+#### Approve user and change the user role to the admin role in the Neon database
+
+<a href="">
+  <img src="public/readme/approve-admin.gif" alt="Admin" />
 </a>
 
 #### Book Detail Page + Borrow button( For approved users)
@@ -135,6 +141,7 @@ Follow these steps to set up the project locally on your machine.
 - Git
 - Node.js
 - npm
+- `@upstash/qstash-cli` to run Qstash and Upstash Workflow on `local mode`
 
 ### Cloning the Repository
 
@@ -188,6 +195,24 @@ EMAILJS_PUBLIC_KEY=
 EMAILJS_PRIVATE_KEY=
 ```
 
+### Running Qstash and Upstash Workflow in local mode
+
+1. Click on the `Local Mode` button
+   <img src="public/readme/qstash-cli-1.png" alt="Qstash" />
+2. Run
+
+   ```bash
+   npx @upstash/qstash-cli@latest dev
+   ```
+
+   If it is working, you will see `Connection Status` like this.
+
+   <img src="public/readme/qstash-cli-2.png" alt="Qstash" />
+
+3. Replace `QSTASH_URL` with `http://localhost:8080` in case you run it on port 8080
+4. Get `QSTASH_TOKEN`, `QSTASH_CURRENT_SIGNING_KEY`, `QSTASH_NEXT_SIGNING_KEY` from your terminal or go to
+   `https://console.upstash.com/workflow/` Quickstart section ( values will be changed when you run it in local mode )
+
 **Running the Project**
 
 ```bash
@@ -210,6 +235,33 @@ Your server will run on [http://localhost:3000](http://localhost:3000/)
   - `react-hook-form` supports many 3rd party `schema validation`, and `zod` is one of them. You can use `zodResolver` from `@hookform/resolvers/zod` to integrate `zod` with `react-hook-form` to validate the form data. But also need to add some boilerplate code to make it work. You can see more details in https://react-hook-form.com/docs/useform#resolver in the example zod section
 
 ## <a name="note">Implementation Notes</a>
+
+- `getUserState` function
+
+  - There is `incorrect logic` when checking for non-active user.
+  - It mean that, if user `away between 3 - 30 days`, it will return `non-active`
+  - If user `away more than 30 days`, it will return `active`. And that will cause onboarding email send to only `active user email`
+
+  ```ts
+  ❌
+  if (
+    timeDifference > THREE_DAYS_IN_MS &&
+    timeDifference <= THIRTY_DAYS_IN_MS
+  ) {
+    return "non-active";
+  }
+  return "active";
+  ```
+
+  - So I change it to code below instead
+
+  ```ts
+  ✅
+  if (timeDifference >= THIRTY_DAYS_IN_MS) {
+    return "non-active";
+  }
+  return "active";
+  ```
 
 - Tailwind CSS
 
@@ -278,7 +330,7 @@ Your server will run on [http://localhost:3000](http://localhost:3000/)
 
 **Noted that**
 
-1. I changed the unit from `day` to `minute` for testing purposes
+1. I changed the unit from `day` to `minute` for testing purposes. So wait for 3 minutes and 30 minutes instead of 3 days and 30 days.
 2. Every time an endpoint has been called, it replicates all previous steps until it arrives at the code where it left off, which means this endpoint must not be affected by time or randomness. In a step that has already run before, it will use the result of that step instead of running it again.
 
 **1A.** On the `server` side, in the Sign up API
@@ -308,6 +360,10 @@ Your server will run on [http://localhost:3000](http://localhost:3000/)
 
 1. Call `EmailJS API` to send an email with supplied parameters on our behalf and track the result on their side.
 
+<a href="">
+  <img src="public/readme/qstash-email-1.png" alt="Qstash" />
+</a>
+
 Note that `Workflow` and `Qstash` are run independently.
 
 **3A.** On the `server` side, in callback endpoint (subscription/reminder) - (after`new-signup` - `wait-for-3-days`)
@@ -320,6 +376,10 @@ Note that `Workflow` and `Qstash` are run independently.
 
 1. Wait until the expected time
 2. Call our callback endpoint with the new `context`
+
+<a href="">
+  <img src="public/readme/workflow-1.png" alt="Workflow" />
+</a>
 
 **4A.** On the `server` side, in the callback endpoint (subscription/reminder) - (after `wait-for-3-days` - `check-user-state`)
 
@@ -355,6 +415,10 @@ Note that `Workflow` and `Qstash` are run independently.
 
 1. Call `EmailJS API` to send an email with supplied parameters on our behalf and track the result on their side.
 
+<a href="">
+  <img src="public/readme/qstash-email-2.png" alt="Qstash" />
+</a>
+
 Note that `Workflow` and `Qstash` are run independently.
 
 **6A.** On the `server` side, in callback endpoint (subscription/reminder) - (after `send-email-non-active` or `send-email-active` - `wait-for-1-month`)
@@ -368,7 +432,15 @@ Note that `Workflow` and `Qstash` are run independently.
 1. Wait until the expected time
 2. Call our callback endpoint with the new `context`
 
+<a href="">
+  <img src="public/readme/workflow-2.png" alt="Workflow" />
+</a>
+
 **7.** Then back to the top of the `while` loop, like at step 4, and continue the whole process again for our `callback endpoint`, `Workflow`, and `Qstash`.
+
+<a href="">
+  <img src="public/readme/workflow-3.png" alt="Workflow" />
+</a>
 
 ## <a name="miss">Missing Features</a>
 
