@@ -8,14 +8,14 @@ Since the whole project is split into 2-part videos ( Part 2 on **JS Mastery Pro
 
 ## Table of Contents
 
-1. [Introduction](#introduction) /
+1. [Introduction](#introduction)
 2. [Demo](#demo)
-3. [Tech Stack](#tech-stack) /
-4. [Features](#features) /
-5. [Quick Start](#quick-start) /
-6. [What I learned](#learn) /
-7. [Implementation Notes](#note) /
-8. [Missing Features](#miss) /
+3. [Tech Stack](#tech-stack)
+4. [Features](#features)
+5. [Quick Start](#quick-start)
+6. [What I learned](#learn)
+7. [Implementation Notes](#note)
+8. [Missing Features](#miss)
 
 ## <a name="introduction">Introduction</a>
 
@@ -238,9 +238,9 @@ Your server will run on [http://localhost:3000](http://localhost:3000/)
 
 - `getUserState` function
 
-  - There is `incorrect logic` when checking for non-active user.
-  - It mean that, if user `away between 3 - 30 days`, it will return `non-active`
-  - If user `away more than 30 days`, it will return `active`. And that will cause onboarding email send to only `active user email`
+  - There is `incorrect logic` when checking for a non-active user.
+  - It means that, if the user is `away between 3 - 30 days`, it will return `non-active`
+  - If the user is `away for more than 30 days`, it will return `active`. And that will cause the onboarding email to be sent to only the `active user email`
 
   ```ts
   ❌
@@ -253,7 +253,7 @@ Your server will run on [http://localhost:3000](http://localhost:3000/)
   return "active";
   ```
 
-  - So I change it to code below instead
+  - So I changed it to the code below instead
 
   ```ts
   ✅
